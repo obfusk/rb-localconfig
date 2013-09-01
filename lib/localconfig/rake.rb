@@ -9,29 +9,37 @@
 #
 # --                                                            ; }}}1
 
+require 'rake/dsl_definition'
+
 require 'localconfig/admin'
 
 # namespace
 module LocalConfig
 
-  # define rake tasks `<namespace>:{exists,create}` that use
-  # `LocalConfig[name].admin_{exists,create}_from_env`
-  #
-  # @option opts [String] :name      ('rails')
-  # @option opts [String] :namespace ('admin')
-  def self.define_rake_tasks(opts = {})
-    name = opts[:name]      || 'rails'
-    ns   = opts[:namespace] || 'admin'
+  # rake tasks
+  module Rake
+    extend ::Rake::DSL
 
-    desc 'exit w/ status 2 if the admin user does not exist'
-    task "#{ns}:exists" do
-      exit 2 unless LocalConfig[name].admin_exists_from_env
+    # define rake tasks `<namespace>:{exists,create}` that use
+    # `LocalConfig[name].admin_{exists,create}_from_env`
+    #
+    # @option opts [String] :name      ('rails')
+    # @option opts [String] :namespace ('admin')
+    def self.define_tasks(opts = {})
+      name = opts[:name]      || 'rails'
+      ns   = opts[:namespace] || 'admin'
+
+      desc 'exit w/ status 2 if the admin user does not exist'
+      task "#{ns}:exists" do
+        exit 2 unless LocalConfig[name].admin_exists_from_env
+      end
+
+      desc 'create the admin user'
+      task "#{ns}:create" do
+        LocalConfig[name].admin_exists_from_env
+      end
     end
 
-    desc 'create the admin user'
-    task "#{ns}:create" do
-      LocalConfig[name].admin_exists_from_env
-    end
   end
 
 end

@@ -20,7 +20,7 @@ module LocalConfig
   # the rake tasks
   class Railtie < Rails::Railtie
     config.local = LocalConfig['rails']
-    rake_tasks { LocalConfig.define_rake_tasks } \
+    rake_tasks { LocalConfig::Rake.define_tasks } \
       unless LocalConfig['rails'].no_rake
   end
 
