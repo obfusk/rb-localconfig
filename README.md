@@ -5,9 +5,11 @@
     Date        : 2013-09-01
 
     Copyright   : Copyright (C) 2013  Felix C. Stegerman
-    Version     : v0.2.0
+    Version     : v0.2.1.SNAPSHOT
 
 []: }}}1
+
+[![Gem Version](https://badge.fury.io/rb/localconfig.png)](http://badge.fury.io/rb/localconfig)
 
 ## Description
 []: {{{1
