@@ -5,7 +5,7 @@
     Date        : 2013-09-01
 
     Copyright   : Copyright (C) 2013  Felix C. Stegerman
-    Version     : v0.0.1.SNAPSHOT
+    Version     : v0.2.0
 
 []: }}}1
 
@@ -24,6 +24,9 @@
   automate application setup.
 
   Just about everything is configurable: see the docs.
+
+  For an example w/ rails, see
+  https://github.com/obfusk/localconfig-rails-example.
 
 []: }}}1
 

@@ -2,11 +2,8 @@ source 'https://rubygems.org'
 
 require 'localconfig/config'
 branch = LocalConfig.branch
-puts "branch: #{branch}"
 
-# gem 'localconfig',
-#   git: 'https://github.com/obfusk/rb-localconfig.git',
-#   branch: 'master'
+gem 'localconfig', require: 'localconfig/rails'
 
-# gem 'foo', branch: branch
-# gem 'bar', branch: branch
+gem 'foo', branch: branch
+gem 'bar', branch: branch
