@@ -15,8 +15,8 @@ end
 
 desc 'Check for warnings'
 task :warn do
-  puts 'TODO'; exit 1
-  # sh 'ruby -w -I lib -r obfusk/util/all -e ""'
+  reqs = %w{ config }.map { |x| "-r localconfig/#{x}" } * ' '
+  sh "ruby -w -I lib #{reqs} -e ''"
 end
 
 desc 'Check for warnings in specs'
