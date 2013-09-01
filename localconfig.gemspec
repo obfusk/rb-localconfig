@@ -2,7 +2,7 @@ require File.expand_path('../lib/localconfig/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = 'localconfig'
-  s.homepage    = 'https://github.com/obfusk/localconfig'
+  s.homepage    = 'https://github.com/obfusk/rb-localconfig'
   s.summary     = 'local configuration for ruby web apps'
 
   s.description = <<-END.gsub(/^ {4}/, '')

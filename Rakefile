@@ -15,7 +15,8 @@ end
 
 desc 'Check for warnings'
 task :warn do
-  sh 'ruby -w -I lib -r obfusk/util/all -e ""'
+  puts 'TODO'; exit 1
+  # sh 'ruby -w -I lib -r obfusk/util/all -e ""'
 end
 
 desc 'Check for warnings in specs'
@@ -47,12 +48,12 @@ end
 desc 'Build SNAPSHOT gem'
 task :snapshot do
   v = Time.new.strftime '%Y%m%d%H%M%S'
-  f = 'lib/obfusk/util/version.rb'
+  f = 'lib/localconfig/version.rb'
   sh "sed -ri~ 's!(SNAPSHOT)!\\1.#{v}!' #{f}"
-  sh 'gem build obfusk-util.gemspec'
+  sh 'gem build localconfig.gemspec'
 end
 
 desc 'Undo SNAPSHOT gem'
 task 'snapshot:undo' do
-  sh 'git checkout -- lib/obfusk/util/version.rb'
+  sh 'git checkout -- lib/localconfig/version.rb'
 end

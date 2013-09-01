@@ -2,7 +2,7 @@
 
     File        : README.md
     Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-    Date        : 2013-08-30
+    Date        : 2013-09-01
 
     Copyright   : Copyright (C) 2013  Felix C. Stegerman
     Version     : v0.0.1.SNAPSHOT
@@ -12,7 +12,7 @@
 ## Description
 []: {{{1
 
-  localconfig - local configuration for ruby web apps
+  [rb-]localconfig - local configuration for ruby web apps
 
   ...
 
