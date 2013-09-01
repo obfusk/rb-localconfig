@@ -23,6 +23,8 @@ Gem::Specification.new do |s|
                 + %w{ localconfig.gemspec } \
                 + Dir['{lib,spec}/**/*.rb']
 
+  s.add_runtime_dependency 'hashie'
+
   s.add_development_dependency 'rake'
   # s.add_development_dependency 'rspec'
 
