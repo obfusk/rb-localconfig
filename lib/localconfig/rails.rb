@@ -13,12 +13,17 @@ require 'rails'
 
 require 'localconfig'
 
+# namespace
 module LocalConfig
+
+  # railtie that sets config.local to LocalConfig['rails'] and adds
+  # the rake tasks
   class Railtie < Rails::Railtie
     config.local = LocalConfig['rails']
     rake_tasks { LocalConfig.define_rake_tasks } \
       unless LocalConfig['rails'].no_rake
   end
+
 end
 
 # vim: set tw=70 sw=2 sts=2 et fdm=marker :

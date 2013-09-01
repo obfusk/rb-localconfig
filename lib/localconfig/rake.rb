@@ -11,10 +11,11 @@
 
 require 'localconfig/admin'
 
+# namespace
 module LocalConfig
 
-  # define rake tasks <namespace>:{exists,create} that use
-  # LocalConfig[name].admin_{exists,create}_from_env
+  # define rake tasks `<namespace>:{exists,create}` that use
+  # `LocalConfig[name].admin_{exists,create}_from_env`
   #
   # @option opts [String] :name      ('rails')
   # @option opts [String] :namespace ('admin')

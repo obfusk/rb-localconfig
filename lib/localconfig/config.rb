@@ -13,6 +13,7 @@ require 'hashie/mash'
 require 'json'
 require 'yaml'
 
+# namespace
 module LocalConfig
 
   CONFIGS = {}

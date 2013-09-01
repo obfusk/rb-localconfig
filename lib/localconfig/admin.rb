@@ -11,11 +11,12 @@
 
 require 'localconfig/config'
 
+# namespace
 module LocalConfig
 
   class Config                                                  # {{{1
 
-    # no rake tasks
+    # set to true to disable rake tasks in railtie
     attr_accessor :no_rake
 
     # block will be run on admin_exists
