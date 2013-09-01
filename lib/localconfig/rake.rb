@@ -30,12 +30,12 @@ module LocalConfig
       ns   = opts[:namespace] || 'admin'
 
       desc 'exit w/ status 2 if the admin user does not exist'
-      task "#{ns}:exists" do
+      task "#{ns}:exists" => :environment do
         exit 2 unless LocalConfig[name].admin_exists_from_env
       end
 
       desc 'create the admin user'
-      task "#{ns}:create" do
+      task "#{ns}:create" => :environment do
         LocalConfig[name].admin_exists_from_env
       end
     end
