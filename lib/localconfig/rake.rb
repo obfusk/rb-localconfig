@@ -36,7 +36,7 @@ module LocalConfig
 
       desc 'create the admin user'
       task "#{ns}:create" => :environment do
-        LocalConfig[name].admin_exists_from_env
+        LocalConfig[name].admin_create_from_env
       end
     end
 
