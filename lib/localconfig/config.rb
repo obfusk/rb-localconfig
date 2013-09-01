@@ -86,6 +86,14 @@ module LocalConfig
 
     # --
 
+    # LocalConfig.branch
+    def branch; LocalConfig.branch; end
+
+    # LocalConfig.env
+    def env; LocalConfig.env; end
+
+    # --
+
     # files relative to path
     def _files(files)
       files.map { |f| "#{path}/#{f}" }
@@ -111,9 +119,27 @@ module LocalConfig
     CONFIGS[name] ||= Config.new
   end
 
-  # like Rails.env
+  # either the current git branch, '(HEAD)' for a detached head, or
+  # nil if not in a git repo; (cached);
+  #
+  # to use this in a Gemfile, you will need to have the localconfig
+  # gem installed locally before running bundle
+  def self.branch
+    @branch ||= _branch
+  end
+
+  # like Rails.env; (cached)
   def self.env
     @env ||= ENV['RAILS_ENV'] || ENV['RACK_ENV'] || 'development'
+  end
+
+  # --
+
+  # current git branch
+  def self._branch
+    c = 'git symbolic-ref -q HEAD 2>/dev/null'
+    b = %x[#{c}].chomp.sub %r{^refs/heads/}, ''
+    [0,1].include?($?.exitstatus) ? (b.empty? ? '(HEAD)' : b) : nil
   end
 
 end

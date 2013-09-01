@@ -2,27 +2,22 @@
 #
 # File        : localconfig/rails.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2013-08-30
+# Date        : 2013-09-01
 #
 # Copyright   : Copyright (C) 2013  Felix C. Stegerman
 # Licence     : GPLv2 or EPLv1
 #
 # --                                                            ; }}}1
 
-require 'localconfig'
-require 'localconfig/rake'
-
 require 'rails'
+
+require 'localconfig'
 
 module LocalConfig
   class Railtie < Rails::Railtie
-    rake_tasks do
-      LocalConfig.define_rake_tasks
-    end
-
-    def self.
-      config.localconfig = # ...
-    end
+    config.local = LocalConfig['rails']
+    rake_tasks { LocalConfig.define_rake_tasks } \
+      unless LocalConfig['rails'].no_rake
   end
 end
 
