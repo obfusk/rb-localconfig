@@ -23,6 +23,9 @@ module LocalConfig
   # configuration
   class Config                                                  # {{{1
 
+    # something went wrong calling `system`
+    class RunError < StandardError; end
+
     # dir
     attr_accessor :dir
 
@@ -34,6 +37,11 @@ module LocalConfig
       @config = {}
       @dir    = opts[:dir] || "#{Dir.home}/.apps"
       @name   = opts[:name] || derive_name
+    end
+
+    # access setting by key
+    def [](k)
+      @config[k.to_s]
     end
 
     # configure; self is passed to the block
@@ -58,7 +66,7 @@ module LocalConfig
       end
     end                                                         # }}}2
 
-    # `<dir>/<name>/...`
+    # `dir/name/...`
     def path(*paths)
       ([dir,name] + paths)*'/'
     end
@@ -70,20 +78,93 @@ module LocalConfig
 
     # require relative to path
     def require(*files)
-      _files(files).map { |f| Kernel.require f }
+      _files(files).each { |f| Kernel.require f[:path] }
+      nil
     end
 
     # load json file relative to path and store as Hashie::Mash in
-    # self.<basename>
+    # self; for example:
+    #
+    # ```
+    # lc.load_json 'foo.json'
+    # lc.foo.key1
+    # lc.load_json 'bar/baz.json'
+    # lc.bar.baz.key2
+    # ```
     def load_json(*files)
-      _load '.json', (-> x { JSON.parse x }), files
+      _load %w{ .json }, (-> x { JSON.parse x }), files
     end
 
     # load yaml file relative to path and store as Hashie::Mash in
-    # self.<basename>
+    # self; for example:
+    #
+    # ```
+    # lc.load_yaml 'foo.yaml'
+    # lc.foo.key1
+    # lc.load_yaml 'bar/baz.yml'
+    # lc.bar.baz.key2
+    # ```
     def load_yaml(*files)
-      _load '.yaml', (-> x { YAML.load x }), files
+      _load %w{ .yml .yaml }, (-> x { YAML.load x }), files
     end
+
+    # `load_{json,yaml}` `*.json`, `*.y{a,}ml` in dir; for example:
+    #
+    # ```
+    # lc.load_dir 'more'  # more/foo.json, more/bar.yml
+    # lc.more.foo.key1
+    # lc.more.bar.key2
+    # ```
+    def load_dir(*dirs)
+      dirs.flat_map do |d|
+        j = glob "#{d}/*.json"; y = glob "#{d}/*.y{a,}ml"
+        load_json *j; load_yaml *y; j + y
+      end
+    end
+
+    # <!-- {{{1 -->
+    #
+    # clone/fetch git repo in dir (to load more config files from
+    # elsewhere); for example:
+    #
+    # ```
+    # lc.load_yaml 'git.yml'  # repo:, branch:
+    # lc.git_repo 'more', c.git.repo, branch: c.git.branch
+    # lc.load_dir 'more'      # more/foo.yml, more/bar.json
+    # ```
+    #
+    # You can't use more than one of `:rev`, `:tag`, `:branch`; if you
+    # specify none, the default is `branch: 'master'`.
+    #
+    # @param [String] path  subpath to clone to
+    # @param [String] url   url to clone from
+    #
+    # @param [Hash] opts options
+    # @option opts [Bool]   :quiet  (true)  whether to be quiet
+    # @option opts [String] :rev            specific revision (SHA1)
+    # @option opts [String] :tag            specific tag
+    # @option opts [String] :branch         specific branch
+    #
+    # <!-- }}}1 -->
+    def git_repo(path, url, opts = {})                          # {{{1
+      q       = opts.fetch(:quiet, true) ? %w{ --quiet } : []
+      b       = opts[:branch]; b = "origin/#{b}" if b && !b['/']
+      rev     = opts[:rev] || opts[:tag]
+      ref     = rev || b || 'origin/master'
+      dest    = path path
+      if File.exist? dest
+        Dir.chdir(dest) do
+          _sys *(%w{ git fetch --force --tags } + q) \
+            unless rev && %x[ git rev-parse HEAD ] ==
+                          %x[ git rev-parse --revs-only #{rev}^0 -- ]
+        end
+      else
+        _sys *(%w{ git clone } + q + [url, dest])
+      end
+      Dir.chdir(dest) do
+        _sys *(%w{ git reset --hard } + q + [ref] + %w{ -- })
+      end
+    end                                                         # }}}1
 
     # --
 
@@ -97,19 +178,30 @@ module LocalConfig
 
     # files relative to path
     def _files(files)
-      files.map { |f| "#{path}/#{f}" }
+      files.map { |f| { f: f, path: "#{path}/#{f}" } }
     end
 
-    # load file relative to path and store as Hashie::Mash in
-    # self.<basename>
-    def _load(ext, parse, files)                                # {{{2
+    # load file relative to path and store as Hashie::Mash in self
+    def _load(exts, parse, files)                               # {{{2
       _files(files).each do |f|
-        b = File.basename f, ext
-        raise "@config[#{b}] already defined" if @config[b]
-        @config[b] = Hashie::Mash.new parse[File.read(f)]
-        define_singleton_method(b) { @config[b] }
+        *pre, b = all = Pathname.new(f[:f]).each_filename.to_a
+        ext     = exts.find { |x| b.end_with? x } || ''
+        k       = File.basename b, ext  ; c_k = (pre+[k]).first
+        o       = @config
+        pre.each { |x| o = o[x] ||= Hashie::Mash.new }
+        raise "self.#{(pre+[k])*'.'} already set" if o[k]
+        o[k]    = Hashie::Mash.new parse[File.read(f[:path])]
+        define_singleton_method(c_k) { @config[c_k] } \
+          unless self.respond_to? c_k
       end
+      nil
     end                                                         # }}}2
+
+    # run!
+    def _sys(cmd, *args)
+      system([cmd, cmd], *args) or \
+        raise RunError, "failed to run command #{[cmd]+args} (#$?)"
+    end
 
   end                                                           # }}}1
 

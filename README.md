@@ -5,11 +5,11 @@
     Date        : 2014-10-21
 
     Copyright   : Copyright (C) 2014  Felix C. Stegerman
-    Version     : v0.2.1.SNAPSHOT
+    Version     : v0.3.0
 
 []: }}}1
 
-[![Gem Version](https://badge.fury.io/rb/localconfig.png)](http://badge.fury.io/rb/localconfig)
+[![Gem Version](https://badge.fury.io/rb/localconfig.png)](https://rubygems.org/gems/localconfig)
 
 ## Description
 []: {{{1
@@ -22,7 +22,7 @@
   files from this directory.
 
   Additionally, it allows rails applications to easily define
-  admin:exists and admin:create rake tasks to make it easier to
+  `admin:exists` and `admin:create` rake tasks to make it easier to
   automate application setup.
 
   Just about everything is configurable: see the docs.
@@ -35,19 +35,24 @@
 ## Examples
 []: {{{1
 
-Gemfile
-
 ```ruby
+# Gemfile
 gem 'localconfig', require: 'localconfig/rails'
 ```
 
-config/localconfig.rb
-
 ```ruby
+# config/localconfig.rb
 LocalConfig['rails'].configure do |c|
   puts "env: #{c.env}, #{Rails.env}"
+
   c.require 'init.rb'
+
   c.load_json 'pg.json'
+  c.load_yaml 'git.yml'   # repo:, branch:
+  c.git_repo 'more', c.git.repo, branch: c.git.branch
+  c.load_dir 'more'       # more/foo.yml, more/bar.json
+  puts "more: #{c.more.foo.key1} #{c.more.bar.key2}"
+
   c.on_admin_exists do |username|
     # ...
   end
