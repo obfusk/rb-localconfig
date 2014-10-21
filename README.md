@@ -2,9 +2,9 @@
 
     File        : README.md
     Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-    Date        : 2013-09-01
+    Date        : 2014-10-21
 
-    Copyright   : Copyright (C) 2013  Felix C. Stegerman
+    Copyright   : Copyright (C) 2014  Felix C. Stegerman
     Version     : v0.2.1.SNAPSHOT
 
 []: }}}1
@@ -37,7 +37,7 @@
 
 Gemfile
 
-```
+```ruby
 gem 'localconfig', require: 'localconfig/rails'
 ```
 
@@ -60,37 +60,24 @@ end
 []: }}}1
 
 ## Specs & Docs
-[]: {{{1
 
-    $ rake spec
-    $ rake docs
-
-[]: }}}1
+```bash
+rake spec
+rake docs
+```
 
 ## TODO
-[]: {{{1
 
   * more specs/docs?
   * ...
 
-[]: }}}1
-
 ## License
-[]: {{{1
 
-  GPLv2 [1] or EPLv1 [2].
-
-[]: }}}1
+  LGPLv3+ [1].
 
 ## References
-[]: {{{1
 
-  [1] GNU General Public License, version 2
-  --- http://www.opensource.org/licenses/GPL-2.0
-
-  [2] Eclipse Public License, version 1
-  --- http://www.opensource.org/licenses/EPL-1.0
-
-[]: }}}1
+  [1] GNU Lesser General Public License, version 3
+  --- http://www.gnu.org/licenses/lgpl-3.0.html
 
 []: ! ( vim: set tw=70 sw=2 sts=2 et fdm=marker : )
