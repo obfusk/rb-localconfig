@@ -2,7 +2,7 @@
 #
 # File        : localconfig/config.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2014-10-21
+# Date        : 2014-10-22
 #
 # Copyright   : Copyright (C) 2014  Felix C. Stegerman
 # Licence     : LGPLv3+
@@ -11,6 +11,7 @@
 
 require 'hashie/mash'
 require 'json'
+require 'pathname'
 require 'yaml'
 
 # namespace
@@ -122,7 +123,7 @@ module LocalConfig
       end
     end
 
-    # <!-- {{{1 -->
+    # <!-- {{{2 -->
     #
     # clone/fetch git repo in dir (to load more config files from
     # elsewhere); for example:
@@ -145,8 +146,8 @@ module LocalConfig
     # @option opts [String] :tag            specific tag
     # @option opts [String] :branch         specific branch
     #
-    # <!-- }}}1 -->
-    def git_repo(path, url, opts = {})                          # {{{1
+    # <!-- }}}2 -->
+    def git_repo(path, url, opts = {})                          # {{{2
       q       = opts.fetch(:quiet, true) ? %w{ --quiet } : []
       b       = opts[:branch]; b = "origin/#{b}" if b && !b['/']
       rev     = opts[:rev] || opts[:tag]
@@ -164,7 +165,7 @@ module LocalConfig
       Dir.chdir(dest) do
         _sys *(%w{ git reset --hard } + q + [ref] + %w{ -- })
       end
-    end                                                         # }}}1
+    end                                                         # }}}2
 
     # --
 
@@ -188,7 +189,7 @@ module LocalConfig
         ext     = exts.find { |x| b.end_with? x } || ''
         k       = File.basename b, ext  ; c_k = (pre+[k]).first
         o       = @config
-        pre.each { |x| o = o[x] ||= Hashie::Mash.new }
+        pre.each { |x| o[x] ||= Hashie::Mash.new; o = o[x] }
         raise "self.#{(pre+[k])*'.'} already set" if o[k]
         o[k]    = Hashie::Mash.new parse[File.read(f[:path])]
         define_singleton_method(c_k) { @config[c_k] } \
