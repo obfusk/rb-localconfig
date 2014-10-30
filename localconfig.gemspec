@@ -7,8 +7,6 @@ Gem::Specification.new do |s|
 
   s.description = <<-END.gsub(/^ {4}/, '')
     local configuration for ruby (web) apps
-
-    ...
   END
 
   s.version     = LocalConfig::VERSION
@@ -27,6 +25,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'rake'
 
   s.add_development_dependency 'rspec'
+  s.add_development_dependency 'simplecov', '~> 0.9.0'  # TODO
+  s.add_development_dependency 'yard'
 
   s.required_ruby_version = '>= 1.9.1'
 end

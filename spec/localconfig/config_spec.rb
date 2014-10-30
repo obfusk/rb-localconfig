@@ -11,7 +11,13 @@
 
 require 'localconfig/config'
 
+require 'fileutils'
+require 'tmpdir'
+
 lcc = LocalConfig::Config
+
+gist1 = 'https://gist.github.com/009eae662748f8778bed.git'
+gist2 = 'https://gist.github.com/80edcd5455d348f9ccb7.git'
 
 describe lcc do
 
@@ -101,7 +107,62 @@ describe lcc do
     end
   end                                                           # }}}1
 
-  # TODO: git_repo
+  context 'git_repo' do                                         # {{{1
+    before(:all) do
+      @pwd = Dir.pwd; @dir = Dir.mktmpdir
+      FileUtils.mkdir_p "#{@dir}/foo"
+      FileUtils.mkdir_p "#{@dir}/apps/foo"
+      FileUtils.mkdir_p "#{@dir}/apps/foo/not_a_git_dir"
+      Dir.chdir "#{@dir}/foo"
+    end
+
+    before(:each) do
+      @lc = lcc.new dir: "#{@dir}/apps"
+    end
+
+    after(:all) do
+      Dir.chdir @pwd; FileUtils.remove_entry_secure @dir
+    end
+
+    it 'clones (& .branch is OK)' do
+      @lc.git_repo 'lc_gist', gist1
+      @lc.load_dir 'lc_gist'
+      expect(@lc.lc_gist.foo.to_hash) .to \
+        eq({ 'x' => 42, 'y' => 37 })
+      expect(@lc.lc_gist.bar.to_hash) .to \
+        eq({ 'spam' => true, 'eggs' => false })
+      expect(@lc.lc_gist.baz.to_hash) .to \
+        eq({ 'answer' => 42 })
+      Dir.chdir("#{@dir}/apps/foo/lc_gist") do
+        expect(LocalConfig.branch).to eq('master')
+      end
+    end
+    it 'resets' do
+      @lc.git_repo 'lc_gist', gist1, rev: 'ba232fd'
+      @lc.load_dir 'lc_gist'
+      expect(@lc.lc_gist.foo.to_hash) .to \
+        eq({ 'x' => 42, 'y' => 99 })
+    end
+    it 'fetches' do
+      Dir.chdir("#{@dir}/apps/foo/lc_gist") do
+        system *(%w{ git remote set-url origin } + [gist2]) \
+          or raise 'OOPS'
+      end
+      @lc.git_repo 'lc_gist', gist2, tag: 'tag_2'
+      @lc.load_dir 'lc_gist'
+      expect(@lc.lc_gist.foo.to_hash) .to \
+        eq({ 'x' => 42, 'y' => 37, 'z' => true })
+    end
+    it 'complains w/ tag + branch' do
+      expect { @lc.git_repo 'dummy', gist1, tag: 'foo', branch: 'bar' } \
+        .to raise_error(ArgumentError,
+          "You can't use more than one of :rev, :tag, :branch")
+    end
+    it 'complains w/o .git' do
+      expect { @lc.git_repo 'not_a_git_dir', gist1 } \
+        .to raise_error(lcc::Error, 'not a git dir')
+    end
+  end                                                           # }}}1
 
 end
 

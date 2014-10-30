@@ -35,6 +35,8 @@
 ## Examples
 []: {{{1
 
+### Rails
+
 ```ruby
 # Gemfile
 gem 'localconfig', require: 'localconfig/rails'
@@ -48,6 +50,11 @@ LocalConfig['rails'].configure do |c|
   c.require 'init.rb'
 
   c.load_json 'pg.json'
+  puts c.pg.username
+
+  c.load_yaml 'foo/bar/baz.json'
+  puts c.foo.bar.baz.some_value
+
   c.load_yaml 'git.yml'   # repo:, branch:
   c.git_repo 'more', c.git.repo, branch: c.git.branch
   c.load_dir 'more'       # more/foo.yml, more/bar.json
@@ -62,12 +69,35 @@ LocalConfig['rails'].configure do |c|
 end
 ```
 
+### Standalone
+
+```ruby
+require 'localconfig'   # loads config/localconfig.rb
+```
+
+or:
+
+```ruby
+require 'localconfig/config'
+LocalConfig['foo'].configure do |c|
+  # ...
+end
+```
+
+### Rake
+
+```ruby
+require 'localconfig'
+ManifestDL::Rake.define_tasks
+```
+
 []: }}}1
 
 ## Specs & Docs
 
 ```bash
 rake spec
+rake coverage
 rake docs
 ```
 

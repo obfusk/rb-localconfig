@@ -13,6 +13,11 @@ task 'spec:less' do
   sh 'rspec -cfd --tty | less -R'
 end
 
+desc 'Run specs w/ coverage'
+task :coverage do
+  ENV['COVERAGE'] = 'yes'; Rake::Task['spec'].execute
+end
+
 desc 'Check for warnings'
 task :warn do
   reqs = %w{ config }.map { |x| "-r localconfig/#{x}" } * ' '
@@ -42,7 +47,7 @@ end
 
 desc 'Cleanup'
 task :clean do
-  sh 'rm -rf .yardoc/ doc/ *.gem'
+  sh 'rm -rf .yardoc/ coverage/ doc/ *.gem'
 end
 
 desc 'Build SNAPSHOT gem'

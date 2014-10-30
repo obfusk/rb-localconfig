@@ -172,8 +172,7 @@ module LocalConfig
         Dir.chdir(dest) do
           _git_dir_check
           s[*(%w{ git fetch --force --tags } + q)] \
-            unless rev && %x[ git rev-parse HEAD ] ==
-                          %x[ git rev-parse --revs-only #{rev}^0 -- ]
+            unless rev && _git_rev('HEAD') == _git_rev(rev)
         end
       else
         s[*(%w{ git clone } + q + [url, dest])]
@@ -226,6 +225,12 @@ module LocalConfig
     def _sys(cmd, *args)
       system([cmd, cmd], *args) or \
         raise Error, "failed to run command #{[cmd]+args} (#$?)"
+    end
+
+    # get hash for revision or tag
+    def _git_rev(rev)
+      hash = %x[ git rev-parse --revs-only #{rev}^0 -- 2>/dev/null ]
+      $?.success? ? hash.chomp : nil
     end
 
   end                                                           # }}}1
