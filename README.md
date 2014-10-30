@@ -5,7 +5,7 @@
     Date        : 2014-10-30
 
     Copyright   : Copyright (C) 2014  Felix C. Stegerman
-    Version     : v0.3.2
+    Version     : v0.3.3
 
 []: }}}1
 
