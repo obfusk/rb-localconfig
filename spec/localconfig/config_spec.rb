@@ -2,7 +2,7 @@
 #
 # File        : localconfig/config_spec.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2014-10-21
+# Date        : 2014-10-30
 #
 # Copyright   : Copyright (C) 2014  Felix C. Stegerman
 # Licence     : LGPLv3+
@@ -60,9 +60,9 @@ describe lcc do
   end                                                           # }}}1
 
   context 'glob' do                                             # {{{1
-    it '* -> init.rb pg.json x.yaml' do
+    it '* -> bar foo init.rb pg.json' do
       expect(test1.glob('*').sort).to eq \
-        %w{ init.rb pg.json x.yaml }
+        %w{ bar foo init.rb pg.json }
     end
     it '*.json -> pg.json' do
       expect(test1.glob('*.json').sort).to eq %w{ pg.json }
@@ -87,11 +87,21 @@ describe lcc do
   end                                                           # }}}1
 
   context 'load_yaml' do                                        # {{{1
-    it 'loads x.yaml' do
-      x = test1.dup; x.load_yaml 'x.yaml'
-      expect(x.x.to_hash).to eq({ 'foo' => 99, 'bar' => 'hi!' })
+    it 'loads foo/x.yaml' do
+      x = test1.dup; x.load_yaml 'foo/x.yaml'
+      expect(x[:foo].x.to_hash).to eq({ 'foo' => 99, 'bar' => 'hi!' })
     end
   end                                                           # }}}1
+
+  context 'load_dir' do                                         # {{{1
+    it 'loads bar/y.yml' do
+      x = test1.dup; x.load_dir 'bar'
+      expect(x.bar.y.to_hash).to \
+        eq({ 'spam' => true, 'eggs' => false })
+    end
+  end                                                           # }}}1
+
+  # TODO: git_repo
 
 end
 

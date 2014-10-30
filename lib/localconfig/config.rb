@@ -2,7 +2,7 @@
 #
 # File        : localconfig/config.rb
 # Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-# Date        : 2014-10-22
+# Date        : 2014-10-30
 #
 # Copyright   : Copyright (C) 2014  Felix C. Stegerman
 # Licence     : LGPLv3+
@@ -24,8 +24,7 @@ module LocalConfig
   # configuration
   class Config                                                  # {{{1
 
-    # something went wrong calling `system`
-    class RunError < StandardError; end
+    class Error < StandardError; end
 
     # dir
     attr_accessor :dir
@@ -148,22 +147,30 @@ module LocalConfig
     #
     # <!-- }}}2 -->
     def git_repo(path, url, opts = {})                          # {{{2
+      %w{ branch rev tag }.count { |x| opts.has_key? x.to_sym } <= 1 \
+        or raise ArgumentError,
+          "You can't use more than one of :rev, :tag, :branch"
       q       = opts.fetch(:quiet, true) ? %w{ --quiet } : []
+      s       = opts.fetch(:quiet, true) ?
+                  -> *a {                    _sys *a } :
+                  -> *a { puts "$ #{a*' '}"; _sys *a }
       b       = opts[:branch]; b = "origin/#{b}" if b && !b['/']
       rev     = opts[:rev] || opts[:tag]
       ref     = rev || b || 'origin/master'
       dest    = path path
       if File.exist? dest
         Dir.chdir(dest) do
-          _sys *(%w{ git fetch --force --tags } + q) \
+          _git_dir_check
+          s[*(%w{ git fetch --force --tags } + q)] \
             unless rev && %x[ git rev-parse HEAD ] ==
                           %x[ git rev-parse --revs-only #{rev}^0 -- ]
         end
       else
-        _sys *(%w{ git clone } + q + [url, dest])
+        s[*(%w{ git clone } + q + [url, dest])]
       end
       Dir.chdir(dest) do
-        _sys *(%w{ git reset --hard } + q + [ref] + %w{ -- })
+        _git_dir_check
+        s[*(%w{ git reset --hard } + q + [ref] + %w{ -- })]
       end
     end                                                         # }}}2
 
@@ -198,10 +205,15 @@ module LocalConfig
       nil
     end                                                         # }}}2
 
+    # check for .git/
+    def _git_dir_check
+      File.exist? '.git/' or raise Error, 'not a git dir'
+    end
+
     # run!
     def _sys(cmd, *args)
       system([cmd, cmd], *args) or \
-        raise RunError, "failed to run command #{[cmd]+args} (#$?)"
+        raise Error, "failed to run command #{[cmd]+args} (#$?)"
     end
 
   end                                                           # }}}1
