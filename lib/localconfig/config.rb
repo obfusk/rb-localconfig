@@ -239,7 +239,7 @@ module LocalConfig
 
   # get (new) Config by name
   def self.[](name)
-    CONFIGS[name] ||= Config.new
+    CONFIGS[name.to_s] ||= Config.new
   end
 
   # either the current git branch, '(HEAD)' for a detached head, or
