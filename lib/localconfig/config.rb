@@ -34,9 +34,19 @@ module LocalConfig
 
     # set dir to ~/.apps, derive name
     def initialize(opts = {})
-      @config = {}
-      @dir    = opts[:dir] || "#{Dir.home}/.apps"
-      @name   = opts[:name] || derive_name
+                  # use Mash: has deep .dup
+      @config   = Hashie::Mash.new(opts[:config] || {})
+      @dir      = opts[:dir] || "#{Dir.home}/.apps"
+      @name     = opts[:name] || derive_name
+      @getters  = @config.keys.select { |x| !respond_to?(x) }
+      @getters.each { |x| define_singleton_method(x) { @config[x] } }
+    end
+
+    alias_method :_dup, :dup
+
+    # deep duplicate
+    def dup
+      self.class.new config: @config, dir: @dir.dup, name: @name.dup
     end
 
     # access setting by key
@@ -199,8 +209,10 @@ module LocalConfig
         pre.each { |x| o[x] ||= Hashie::Mash.new; o = o[x] }
         raise "self.#{(pre+[k])*'.'} already set" if o[k]
         o[k]    = Hashie::Mash.new parse[File.read(f[:path])]
-        define_singleton_method(c_k) { @config[c_k] } \
-          unless self.respond_to? c_k
+        unless respond_to? c_k
+          define_singleton_method(c_k) { @config[c_k] }
+          @getters << c_k
+        end
       end
       nil
     end                                                         # }}}2
