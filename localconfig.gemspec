@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.files       = %w{ .yardopts README.md Rakefile } \
                 + %w{ localconfig.gemspec } \
-                + Dir['{lib,spec}/**/*.rb']
+                + Dir['lib/**/*.rb']
 
   s.add_runtime_dependency 'hashie'
   s.add_runtime_dependency 'rake'
