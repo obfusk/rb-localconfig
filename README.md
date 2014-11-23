@@ -2,7 +2,7 @@
 
     File        : README.md
     Maintainer  : Felix C. Stegerman <flx@obfusk.net>
-    Date        : 2014-10-30
+    Date        : 2014-11-23
 
     Copyright   : Copyright (C) 2014  Felix C. Stegerman
     Version     : v0.3.3
@@ -10,6 +10,7 @@
 []: }}}1
 
 [![Gem Version](https://badge.fury.io/rb/localconfig.png)](https://rubygems.org/gems/localconfig)
+[![Build Status](https://travis-ci.org/obfusk/rb-localconfig.png)](https://travis-ci.org/obfusk/rb-localconfig)
 
 ## Description
 []: {{{1
